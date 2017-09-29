@@ -54,7 +54,8 @@ discover_endpoints() {
   # Pretty print JSON reponse
   eval "echo '${response}' | jq '.'"
 
-  command="echo '${response}' | jq '.${STAGE}Nosql'"
+  # Use jq --raw-output to remove get string without quotes.
+  command="echo '${response}' | jq --raw-output '.${STAGE}Nosql'"
   STAGE_BASE_URL="$(eval "${command}")"
   readonly STAGE_BASE_URL
   echo -e "\n${YELLOW}Stage Base URL: ${STAGE_BASE_URL}${RC}"
@@ -73,7 +74,8 @@ auth_nosql() {
   # Pretty print JSON reponse
   eval "echo '${response}' | jq '.'"
 
-  command="echo '${response}' | jq '.\"X-GS-JWT\"'"
+  # Use jq --raw-output to remove get string without quotes.
+  command="echo '${response}' | jq --raw-output '.\"X-GS-JWT\"'"
   JWT="$(eval "${command}")"
   readonly JWT
   echo -e "\n${YELLOW}JSON Web Token: ${JWT}${RC}"

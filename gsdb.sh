@@ -4,6 +4,7 @@
 # https://docs.gamesparks.com/api-documentation/nosql-rest-api.html
 #
 # This script has a dependency on jq: https://stedolan.github.io/jq/
+# Make sure jq is installed on your system and is present in PATH.
 
 ### Colors ###
 

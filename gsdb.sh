@@ -101,8 +101,28 @@ remove_documents() {
   done
 }
 
+delete_collections() {
+  echo -e "${MAGENTA}Deleting collections from NoSQL database...${RC}"
+
+  for collection in "${COLLECTIONS[@]}"
+  do
+      echo -e "\n${YELLOW}Deleting collection '${collection}'...${RC}\n"
+
+      local command="curl --silent -X DELETE --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}"
+      echo -e "> ${CYAN}${command}${RC}\n"
+
+      local response
+      response="$(eval "${command}")"
+
+      # Pretty print JSON reponse
+      eval "echo '${response}' | jq '.'"
+  done
+}
+
 discover_endpoints
 echo -e '\n--------------------\n'
 auth_nosql
 echo -e '\n--------------------\n'
 remove_documents
+echo -e '\n--------------------\n'
+delete_collections

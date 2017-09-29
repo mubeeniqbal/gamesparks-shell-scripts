@@ -39,6 +39,8 @@ readonly PASSWORD=''
 readonly API_KEY=''
 readonly STAGE=''
 
+readonly COLLECTIONS=('script.log' 'playerMessage' 'teamChatHistory' 'teams')
+
 STAGE_BASE_URL=''
 JWT=''
 
@@ -81,6 +83,26 @@ auth_nosql() {
   echo -e "\n${YELLOW}JSON Web Token: ${JWT}${RC}"
 }
 
+remove_documents() {
+  echo -e "${MAGENTA}Removing documents from NoSQL database...${RC}"
+
+  for collection in "${COLLECTIONS[@]}"
+  do
+      echo -e "\n${YELLOW}Removing all documents from collection '${collection}'...${RC}\n"
+
+      local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' -d '{ \"query\": {} }' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}/remove"
+      echo -e "> ${CYAN}${command}${RC}\n"
+
+      local response
+      response="$(eval "${command}")"
+
+      # Pretty print JSON reponse
+      eval "echo '${response}' | jq '.'"
+  done
+}
+
 discover_endpoints
-echo -e "\n--------------------\n"
+echo -e '\n--------------------\n'
 auth_nosql
+echo -e '\n--------------------\n'
+remove_documents

@@ -39,6 +39,7 @@ readonly API_KEY=''
 readonly STAGE=''
 
 STAGE_BASE_URL=''
+JWT=''
 
 discover_endpoints() {
   echo -e "${MAGENTA}Discovering endpoints...${RC}\n"
@@ -58,4 +59,25 @@ discover_endpoints() {
   echo -e "\n${YELLOW}Stage Base URL: ${STAGE_BASE_URL}${RC}"
 }
 
+auth_nosql() {
+  echo -e "${MAGENTA}Authenticating user to access NoSQL database...${RC}\n"
+
+  local filter='nosql'
+  local command="curl --silent --user ${USERNAME}:${PASSWORD} -X GET --header 'Accept: application/json' ${AUTH_URL}/restv2/auth/game/${API_KEY}/jwt/${filter}"
+  echo -e "> ${CYAN}${command}${RC}\n"
+
+  local response
+  response="$(eval "${command}")"
+
+  # Pretty print JSON reponse
+  eval "echo '${response}' | jq '.'"
+
+  command="echo '${response}' | jq '.\"X-GS-JWT\"'"
+  JWT="$(eval "${command}")"
+  readonly JWT
+  echo -e "\n${YELLOW}JSON Web Token: ${JWT}${RC}"
+}
+
 discover_endpoints
+echo -e "\n--------------------\n"
+auth_nosql

@@ -40,6 +40,8 @@ readonly API_KEY=''
 readonly STAGE=''
 
 readonly COLLECTIONS=('script.log' 'playerMessage' 'teamChatHistory' 'teams')
+declare -a SYSTEM_COLLECTIONS
+declare -a RUNTIME_COLLECTIONS
 
 STAGE_BASE_URL=''
 JWT=''
@@ -83,6 +85,57 @@ auth_nosql() {
   echo -e "\n${YELLOW}JSON Web Token: ${JWT}${RC}"
 }
 
+list_collections() {
+  echo -e "${MAGENTA}Listing NoSQL database collections...${RC}\n"
+
+  local filter='nosql'
+  local command="curl --silent -X GET --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collections"
+  echo -e "> ${CYAN}${command}${RC}\n"
+
+  local response
+  response="$(eval "${command}")"
+
+  # Pretty print JSON reponse
+  eval "echo '${response}' | jq '.'"
+
+  # System collections
+
+  # Use jq --raw-output to remove get string without quotes.
+  # We base64 encode to get rid of spaces and newlines. Later on we will
+  # base64 decode all the values.
+  command="echo '${response}' | jq --raw-output '.[] | select(.optionGroup == \"System\") | .name | @base64'"
+
+  local collection
+  unset SYSTEM_COLLECTIONS
+
+  for collection_base64 in $(eval "${command}")
+  do
+    # We have to output this way to append newline character at the end.
+    collection="$(echo "$(echo "${collection_base64}" | base64 --decode)")"
+    SYSTEM_COLLECTIONS+=("${collection}")
+  done
+
+  echo -e "\n${YELLOW}System Collections: ${SYSTEM_COLLECTIONS[*]}${RC}"
+
+  # Runtime collections
+
+  # Use jq --raw-output to remove get string without quotes.
+  # We base64 encode to get rid of spaces and newlines. Later on we will
+  # base64 decode all the values.
+  command="echo '${response}' | jq --raw-output '.[] | select(.optionGroup == \"Runtime\") | .name | @base64'"
+
+  unset RUNTIME_COLLECTIONS
+
+  for collection_base64 in $(eval "${command}")
+  do
+    # We have to output this way to append newline character at the end.
+    collection="$(echo "$(echo "${collection_base64}" | base64 --decode)")"
+    RUNTIME_COLLECTIONS+=("${collection}")
+  done
+
+  echo -e "\n${YELLOW}Runtime Collections: ${RUNTIME_COLLECTIONS[*]}${RC}"
+}
+
 remove_documents() {
   echo -e "${MAGENTA}Removing documents from NoSQL database...${RC}"
 
@@ -123,6 +176,8 @@ discover_endpoints
 echo -e '\n--------------------\n'
 auth_nosql
 echo -e '\n--------------------\n'
-remove_documents
-echo -e '\n--------------------\n'
-delete_collections
+list_collections
+#echo -e '\n--------------------\n'
+#remove_documents
+#echo -e '\n--------------------\n'
+#delete_collections

@@ -174,8 +174,6 @@ delete_runtime_collections() {
 }
 
 nuke_nosql() {
-  list_collections
-  echo -e '\n--------------------\n'
   remove_documents
   echo -e '\n--------------------\n'
   delete_collections
@@ -184,5 +182,7 @@ nuke_nosql() {
 discover_endpoints
 echo -e '\n--------------------\n'
 auth_nosql
+echo -e '\n--------------------\n'
+list_collections
 echo -e '\n--------------------\n'
 nuke_nosql

@@ -134,6 +134,8 @@ list_collections() {
   done
 
   echo -e "\n${YELLOW}Runtime Collections: ${RUNTIME_COLLECTIONS[*]}${RC}"
+
+  # TODO(mubeeniqbal): Add Meta, Leaderboards and Running Totals collections.
 }
 
 remove_documents() {
@@ -141,16 +143,16 @@ remove_documents() {
 
   for collection in "${COLLECTIONS[@]}"
   do
-      echo -e "\n${YELLOW}Removing all documents from collection '${collection}'...${RC}\n"
+    echo -e "\n${YELLOW}Removing all documents from collection '${collection}'...${RC}\n"
 
-      local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' -d '{ \"query\": {} }' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}/remove"
-      echo -e "> ${CYAN}${command}${RC}\n"
+    local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' -d '{ \"query\": {} }' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}/remove"
+    echo -e "> ${CYAN}${command}${RC}\n"
 
-      local response
-      response="$(eval "${command}")"
+    local response
+    response="$(eval "${command}")"
 
-      # Pretty print JSON reponse
-      eval "echo '${response}' | jq '.'"
+    # Pretty print JSON reponse
+    eval "echo '${response}' | jq '.'"
   done
 }
 
@@ -159,16 +161,16 @@ delete_collections() {
 
   for collection in "${COLLECTIONS[@]}"
   do
-      echo -e "\n${YELLOW}Deleting collection '${collection}'...${RC}\n"
+    echo -e "\n${YELLOW}Deleting collection '${collection}'...${RC}\n"
 
-      local command="curl --silent -X DELETE --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}"
-      echo -e "> ${CYAN}${command}${RC}\n"
+    local command="curl --silent -X DELETE --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}"
+    echo -e "> ${CYAN}${command}${RC}\n"
 
-      local response
-      response="$(eval "${command}")"
+    local response
+    response="$(eval "${command}")"
 
-      # Pretty print JSON reponse
-      eval "echo '${response}' | jq '.'"
+    # Pretty print JSON reponse
+    eval "echo '${response}' | jq '.'"
   done
 }
 

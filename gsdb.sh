@@ -39,7 +39,6 @@ readonly PASSWORD=''
 readonly API_KEY=''
 readonly STAGE=''
 
-readonly COLLECTIONS=('script.log' 'playerMessage' 'teamChatHistory' 'teams')
 declare -a SYSTEM_COLLECTIONS
 declare -a RUNTIME_COLLECTIONS
 
@@ -138,10 +137,10 @@ list_collections() {
   # TODO(mubeeniqbal): Add Meta, Leaderboards and Running Totals collections.
 }
 
-remove_documents() {
-  echo -e "${MAGENTA}Removing documents from NoSQL database...${RC}"
+remove_system_collection_documents() {
+  echo -e "${MAGENTA}Removing documents from system collections...${RC}"
 
-  for collection in "${COLLECTIONS[@]}"
+  for collection in "${SYSTEM_COLLECTIONS[@]}"
   do
     echo -e "\n${YELLOW}Removing all documents from collection '${collection}'...${RC}\n"
 
@@ -156,10 +155,10 @@ remove_documents() {
   done
 }
 
-delete_collections() {
-  echo -e "${MAGENTA}Deleting collections from NoSQL database...${RC}"
+delete_runtime_collections() {
+  echo -e "${MAGENTA}Deleting runtime collections...${RC}"
 
-  for collection in "${COLLECTIONS[@]}"
+  for collection in "${RUNTIME_COLLECTIONS[@]}"
   do
     echo -e "\n${YELLOW}Deleting collection '${collection}'...${RC}\n"
 
@@ -174,12 +173,16 @@ delete_collections() {
   done
 }
 
+nuke_nosql() {
+  list_collections
+  echo -e '\n--------------------\n'
+  remove_documents
+  echo -e '\n--------------------\n'
+  delete_collections
+}
+
 discover_endpoints
 echo -e '\n--------------------\n'
 auth_nosql
 echo -e '\n--------------------\n'
-list_collections
-#echo -e '\n--------------------\n'
-#remove_documents
-#echo -e '\n--------------------\n'
-#delete_collections
+nuke_nosql

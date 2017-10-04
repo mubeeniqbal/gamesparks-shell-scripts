@@ -142,7 +142,7 @@ remove_system_collection_documents() {
 
   for collection in "${SYSTEM_COLLECTIONS[@]}"
   do
-    echo -e "\n${YELLOW}Removing all documents from collection '${collection}'...${RC}\n"
+    echo -e "\n${YELLOW}Removing all documents from collection '${collection}' ...${RC}\n"
 
     local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' -d '{ \"query\": {} }' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}/remove"
     echo -e "> ${CYAN}${command}${RC}\n"
@@ -160,7 +160,7 @@ delete_runtime_collections() {
 
   for collection in "${RUNTIME_COLLECTIONS[@]}"
   do
-    echo -e "\n${YELLOW}Deleting collection '${collection}'...${RC}\n"
+    echo -e "\n${YELLOW}Deleting collection '${collection}' ...${RC}\n"
 
     local command="curl --silent -X DELETE --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}"
     echo -e "> ${CYAN}${command}${RC}\n"
@@ -174,9 +174,49 @@ delete_runtime_collections() {
 }
 
 nuke_nosql() {
-  remove_documents
+  remove_system_collection_documents
   echo -e '\n--------------------\n'
-  delete_collections
+  delete_runtime_collections
+}
+
+create_name_generator_data_collection() {
+  local COLLECTION="nameGeneratorData";
+
+  echo -e "${MAGENTA}Creating runtime collection 'script.${COLLECTION}' ...${RC}\n"
+
+  local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${COLLECTION}/runtime"
+  echo -e "> ${CYAN}${command}${RC}\n"
+
+  local response
+  response="$(eval "${command}")"
+
+  # Pretty print JSON reponse
+  eval "echo '${response}' | jq '.'"
+
+  local ADJECTIVES_DOCUMENT='{ "_id": "adjectives", "list": ["Able","Acute","Alien","Alive","Alone","Ample","Angry","Armed","Bad","Big","Black","Blind","Blue","Bold","Bored","Brave","Broad","Brown","Busy","Calm","Cheap","Chief","Civic","Civil","Clean","Clear","Cold","Cool","Crazy","Crude","Cruel","Dark","Dual","Eager","Easy","Evil","Exact","Fair","Fast","Fat","Fatal","Final","Fine","Firm","Fit","Fond","Free","Fresh","Fun","Funny","Giant","Glad","Gold","Good","Grand","Great","Green","Gray","Grim","Handy","Happy","Hard","Harsh","Head","Heavy","High","Holy","Hot","Huge","Ideal","Just","Keen","Key","Kind","Known","Large","Last","Latin","Lazy","Legal","Light","Live","Local","Lone","Long","Loose","Lost","Loud","Low","Loyal","Lucky","Mad","Magic","Major","Mean","Mild","Nasty","Neat","New","Nice","Noble","Noisy","Novel","Odd","Old","Other","Outer","Pale","Plain","Prime","Proud","Pure","Quick","Quiet","Rapid","Rare","Raw","Ready","Real","Rear","Red","Rich","Right","Rigid","Rival","Rough","Round","Royal","Rude","Rural","Safe","Sharp","Sheer","Short","Silly","Slim","Sly","Small","Smart","Soft","Solar","Solo","Solid","Sore","Sound","Steep","Stiff","Still","Sunny","Super","Sure","Sweet","Swift","Tall","Tense","Thick","Thin","Tight","Tiny","Top","Total","Tough","Toxic","True","Upper","Upset","Urban","Usual","Vague","Valid","Vast","Vital","Vivid","Warm","Wary","Wee","Weird","Wet","White","Wide","Wild","Wise","Wrong","Young"] }';
+  local NOUNS_DOCUMENT='{ "_id": "nouns", "list": ["Aardvark","Aardwolf","Acai","Aceola","Albatross","Alligator","Alpaca","Anaconda","Angelfish","Anglerfish","Ant","Anteater","Antelope","Antlion","Ape","Aphid","Apollo","Apple","Apricot","Ares","Argo","Arkantos","Armadillo","Asp","Atlas","Avocado","Baboon","Badger","Banana","Bandicoot","Barnacle","Barracuda","Basilisk","Bass","Bat","Bear","Beaver","Bedbug","Bee","Beetle","Berry","Bird","Bison","Black","Blackbird","Blue","Boa","Boar","Bobcat","Bobolink","Bonobo","Bovid","Buffalo","Bug","Bull","Bulldog","Butterfly","Buzzard","Camel","Canid","Capybara","Caracal","Cardinal","Caribou","Carp","Cat","Catfish","Cattle","Centaur","Centipede","Cephalopod","Cerberus","Chameleon","Chamois","Cheetah","Cherry","Chickadee","Chicken","Chihuahua","Chimera","Chimp","Chimpanzee","Chinchilla","Chipmunk","Chough","Clam","Clownfish","Cobra","Coconut","Cod","Coelocanth","Collie","Condor","Coral","Cormorant","Cougar","Cow","Coy","Coyote","Crab","Cranberry","Crane","Crawdad","Crayfish","Cricket","Crocodile","Crow","Cuckoo","Cucumber","Curlew","Cyclops","Damselfly","Deer","Dingo","Dinosaur","Dionysus","Dog","Dogfish","Dolphin","Donkey","Dormouse","Dotterel","Dove","Dragon","Dragonfly","Duck","Dugong","Dunlin","Eagle","Earthworm","Earwig","Echidna","Eel","Egret","Eland","Elephant","Elk","Empusa","Emu","English","Eos","Ermine","Falcon","Ferret","Fig","Finch","Firefly","Fish","Flamingo","Flea","Fly","Flyingfish","Fowl","Fox","Frog","Galago","Gaur","Gazelle","Gecko","Gerbil","Ghost","Gibbon","Gila","Giraffe","Gnat","Gnu","Goat","Goldfinch","Goldfish","Goose","Gooseberry","Gopher","Gorilla","Goshawk","Grape","Grapefruit","Grassho","Greyhound","Griffin","Grouse","Guanaco","Guineafowl","Gull","Guppy","Haddock","Hades","Halibut","Hamster","Hare","Harrier","Hawfinch","Hawk","Hedgehog","Helios","Heracles","Hercules","Hermes","Heron","Herring","Hippo","Hippogriff","Hookworm","Hornet","Horse","Hound","Human","Husky","Hydra","Hyena","Iguana","Impala","Insect","Jackal","Jackfruit","Jaguar","Jay","Jellyfish","Kangaroo","Kingfisher","Kite","Kiwi","Koala","Koi","Kouprey","Krill","Kronos","Kudu","Ladybug","Lamprey","Lapwing","Lark","Leech","Lemming","Lemon","Lemur","Leopard","Leopon","Liger","Lime","Lion","Llama","Lobster","Locust","Loon","Loris","Louse","Lungfish","Lychee","Lynx","Lyrebird","Macaw","Mackerel","Magpie","Mallard","Mammal","Mammoth","Manatee","Mango","Margay","Marlin","Marmoset","Marmot","Marsupial","Marten","Mastiff","Mastodon","Meadowlark","Medusa","Meerkat","Melon","Merekat","Mink","Minnow","Minotaur","Mite","Mole","Mollusk","Mongoose","Monkey","Monster","Moose","Mosquito","Moth","Mouse","Mudskipper","Mulberry","Mule","Mullet","Muskox","Mussel","Narwhal","Newt","Ocelot","Octopus","Okapi","Old","Opossum","Orangutan","Orca","Orion","Oryx","Ostrich","Otter","Owl","Ox","Oyster","Panda","Panther","Papaya","Parakeet","Parrot","Parrotfish","Partridge","Peach","Peacock","Peafowl","Pear","Pegasus","Pekingese","Pelican","Penguin","Perch","Peregrine","Perentie","Perseus","Pheasant","Phoenix","Pigeon","Pike","Pineapple","Pinniped","Piranha","Planarian","Platypus","Plum","Pointer","Pony","Poodle","Porcupine","Porpoise","Poseidon","Possum","PperGrouse","Prawn","Primate","Prometheus","Prune","Puffin","Puma","Python","Quail","Quelea","Rabbit","Raccoon","Rail","Ram","Raspberry","Rat","Raven","Reindeer","Rhinoceros","Roadrunner","Robin","Rodent","Rook","Rooster","Roundworm","Ruff","Sailfish","Salamander","Salmon","Sandpiper","Sardine","Sawfish","Scallop","Scorpion","Scylla","Seahorse","Seal","Serval","Setter","Shade","Shark","Sheep","Shrew","Shrimp","Silkworm","Silverfish","Skink","Sloth","Slug","Smelt","Snail","Snake","Snipe","Sole","Spaniel","Sparrow","Sphinx","Spider","Spirit","Sponge","Spoonbill","Squid","Squirrel","Starfish","Starling","Stingray","Stinkbug","Stoat","Stork","Strawberry","Sturgeon","Swan","Swift","Swordfish","Swordtail","Tahr","Takin","Tangerine","Tapeworm","Tapir","Tarantula","Tarsier","Termite","Tern","Terrier","Themis","Thrush","Tick","Tiger","Tigon","Toad","Tortoise","Toucan","Trojan","Trout","Tuna","Turkey","Turtle","Typhon","Urchin","Urial","Vampire","Vicuña","Viper","Vole","Vulture","Wallaby","Walrus","Warbler","Warthog","Wasp","Watermelon","Werewolf","Whale","Whitefish","Wildcat","Wildebeest","Wildfowl","Wolf","Wolverine","Wombat","Woodcock","Woodpecker","Worm","Wren","Yak","Zebra","Zeus"] }';
+
+  local DOCUMENTS=("${ADJECTIVES_DOCUMENT}" "${NOUNS_DOCUMENT}")
+
+  for document in "${DOCUMENTS[@]}"
+  do
+    echo -e "\n${YELLOW}Inserting document '${document:0:50}...' ...${RC}\n"
+
+    local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json;charset=UTF-8' --header 'X-GS-JWT: ${JWT}' -d '${document}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/script.${COLLECTION}/insert"
+    echo -e "> ${CYAN}${command}${RC}\n"
+
+    local response
+    response="$(eval "${command}")"
+
+    # Pretty print JSON reponse
+    eval "echo '${response}' | jq '.'"
+  done
+}
+
+init_nosql() {
+  echo -e "${MAGENTA}Initializing NoSQL database...${RC}\n"
+
+  create_name_generator_data_collection
 }
 
 discover_endpoints
@@ -186,3 +226,5 @@ echo -e '\n--------------------\n'
 list_collections
 echo -e '\n--------------------\n'
 nuke_nosql
+echo -e '\n--------------------\n'
+init_nosql

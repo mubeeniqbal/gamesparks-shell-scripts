@@ -30,6 +30,8 @@ readonly BRIGHT_WHITE='\033[1;37m'
 
 ### End Colors ###
 
+DEPENDENCIES=('jq')
+
 readonly AUTH_URL='https://auth.gamesparks.net'
 readonly CONFIG_URL='https://config2.gamesparks.net'
 
@@ -44,6 +46,19 @@ declare -a RUNTIME_COLLECTIONS
 
 STAGE_BASE_URL=''
 JWT=''
+
+check_dependencies() {
+  for dependency in "${DEPENDENCIES[@]}"
+  do
+    command -v "${dependency}" >/dev/null 2>&1
+
+    if [[ "${?}" != 0 ]]; then
+      echo -e "${RED}Error: \`${dependency}\` is not installed on your system.${RC}" >&2
+      echo -e "${YELLOW}\`$(basename ${0})\` requires \`${dependency}\` to run. Please install \`${dependency}\` first.${RC}"
+      exit 1
+    fi
+  done
+}
 
 discover_endpoints() {
   echo -e "${MAGENTA}Discovering endpoints...${RC}\n"
@@ -245,6 +260,8 @@ init_nosql() {
   create_name_generator_data_collection
   create_player_tag_counter_collection
 }
+
+check_dependencies
 
 discover_endpoints
 echo -e '\n--------------------\n'

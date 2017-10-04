@@ -181,7 +181,6 @@ nuke_nosql() {
 
 create_name_generator_data_collection() {
   local COLLECTION="nameGeneratorData";
-
   echo -e "${MAGENTA}Creating runtime collection 'script.${COLLECTION}' ...${RC}\n"
 
   local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${COLLECTION}/runtime"
@@ -213,10 +212,38 @@ create_name_generator_data_collection() {
   done
 }
 
+create_player_tag_counter_collection() {
+  local COLLECTION="playerTagCounter";
+  echo -e "${MAGENTA}Creating runtime collection 'script.${COLLECTION}' ...${RC}\n"
+
+  local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${COLLECTION}/runtime"
+  echo -e "> ${CYAN}${command}${RC}\n"
+
+  local response
+  response="$(eval "${command}")"
+
+  # Pretty print JSON reponse
+  eval "echo '${response}' | jq '.'"
+
+  local DOCUMENT='{ "_id": "playerTagCounter", "counter": 0 }'
+
+  echo -e "\n${YELLOW}Inserting document '${DOCUMENT:0:50}...' ...${RC}\n"
+
+  local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json;charset=UTF-8' --header 'X-GS-JWT: ${JWT}' -d '${DOCUMENT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/script.${COLLECTION}/insert"
+  echo -e "> ${CYAN}${command}${RC}\n"
+
+  local response
+  response="$(eval "${command}")"
+
+  # Pretty print JSON reponse
+  eval "echo '${response}' | jq '.'"
+}
+
 init_nosql() {
   echo -e "${MAGENTA}Initializing NoSQL database...${RC}\n"
 
   create_name_generator_data_collection
+  create_player_tag_counter_collection
 }
 
 discover_endpoints

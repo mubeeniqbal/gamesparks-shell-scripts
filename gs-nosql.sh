@@ -269,4 +269,4 @@ main() {
   init_nosql
 }
 
-main
+main "$@"

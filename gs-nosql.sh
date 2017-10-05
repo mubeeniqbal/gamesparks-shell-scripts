@@ -48,8 +48,7 @@ STAGE_BASE_URL=''
 JWT=''
 
 check_dependencies() {
-  for dependency in "${DEPENDENCIES[@]}"
-  do
+  for dependency in "${DEPENDENCIES[@]}"; do
     command -v "${dependency}" >/dev/null 2>&1
 
     if [[ "${?}" != 0 ]]; then
@@ -122,8 +121,7 @@ list_collections() {
   local collection
   unset SYSTEM_COLLECTIONS
 
-  for collection_base64 in $(eval "${command}")
-  do
+  for collection_base64 in $(eval "${command}"); do
     # We have to output this way to append newline character at the end.
     collection="$(echo "$(echo "${collection_base64}" | base64 --decode)")"
     SYSTEM_COLLECTIONS+=("${collection}")
@@ -140,8 +138,7 @@ list_collections() {
 
   unset RUNTIME_COLLECTIONS
 
-  for collection_base64 in $(eval "${command}")
-  do
+  for collection_base64 in $(eval "${command}"); do
     # We have to output this way to append newline character at the end.
     collection="$(echo "$(echo "${collection_base64}" | base64 --decode)")"
     RUNTIME_COLLECTIONS+=("${collection}")
@@ -155,8 +152,7 @@ list_collections() {
 remove_system_collection_documents() {
   echo -e "${MAGENTA}Removing documents from system collections...${RC}"
 
-  for collection in "${SYSTEM_COLLECTIONS[@]}"
-  do
+  for collection in "${SYSTEM_COLLECTIONS[@]}"; do
     echo -e "\n${YELLOW}Removing all documents from collection '${collection}' ...${RC}\n"
 
     local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' -d '{ \"query\": {} }' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}/remove"
@@ -173,8 +169,7 @@ remove_system_collection_documents() {
 delete_runtime_collections() {
   echo -e "${MAGENTA}Deleting runtime collections...${RC}"
 
-  for collection in "${RUNTIME_COLLECTIONS[@]}"
-  do
+  for collection in "${RUNTIME_COLLECTIONS[@]}"; do
     echo -e "\n${YELLOW}Deleting collection '${collection}' ...${RC}\n"
 
     local command="curl --silent -X DELETE --header 'Accept: application/json' --header 'X-GS-JWT: ${JWT}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/${collection}"
@@ -212,8 +207,7 @@ create_name_generator_data_collection() {
 
   local DOCUMENTS=("${ADJECTIVES_DOCUMENT}" "${NOUNS_DOCUMENT}")
 
-  for document in "${DOCUMENTS[@]}"
-  do
+  for document in "${DOCUMENTS[@]}"; do
     echo -e "\n${YELLOW}Inserting document '${document:0:50}...' ...${RC}\n"
 
     local command="curl --silent -X POST --header 'Content-Type: application/json;charset=UTF-8' --header 'Accept: application/json;charset=UTF-8' --header 'X-GS-JWT: ${JWT}' -d '${document}' ${STAGE_BASE_URL}/restv2/game/${API_KEY}/mongo/collection/script.${COLLECTION}/insert"

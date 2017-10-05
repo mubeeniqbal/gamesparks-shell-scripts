@@ -255,14 +255,18 @@ init_nosql() {
   create_player_tag_counter_collection
 }
 
-check_dependencies
+main() {
+  check_dependencies
 
-discover_endpoints
-echo -e '\n--------------------\n'
-auth_nosql
-echo -e '\n--------------------\n'
-list_collections
-echo -e '\n--------------------\n'
-nuke_nosql
-echo -e '\n--------------------\n'
-init_nosql
+  discover_endpoints
+  echo -e '\n--------------------\n'
+  auth_nosql
+  echo -e '\n--------------------\n'
+  list_collections
+  echo -e '\n--------------------\n'
+  nuke_nosql
+  echo -e '\n--------------------\n'
+  init_nosql
+}
+
+main

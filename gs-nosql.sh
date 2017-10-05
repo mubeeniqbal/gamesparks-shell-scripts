@@ -51,7 +51,7 @@ check_dependencies() {
   for dependency in "${DEPENDENCIES[@]}"; do
     command -v "${dependency}" >/dev/null 2>&1
 
-    if [[ "${?}" != 0 ]]; then
+    if [[ "${?}" -ne 0 ]]; then
       echo -e "${RED}Error: '${dependency}' is not installed on your system.${RC}" >&2
       echo -e "${YELLOW}'$(basename ${0})' requires '${dependency}' to run. Please install '${dependency}' first.${RC}"
       exit 1

@@ -47,13 +47,17 @@ declare -a RUNTIME_COLLECTIONS
 STAGE_BASE_URL=''
 JWT=''
 
+echo_error() {
+  echo -e "${RED}[$(date +'%Y-%m-%dT%H:%M:%S%z')] Error: ${*}${RC}" >&2
+}
+
 check_dependencies() {
   for dependency in "${DEPENDENCIES[@]}"; do
     command -v "${dependency}" >/dev/null 2>&1
 
     if [[ "$?" -ne 0 ]]; then
-      echo -e "${RED}Error: '${dependency}' is not installed on your system.${RC}" >&2
-      echo -e "${YELLOW}'$(basename $0)' requires '${dependency}' to run. Please install '${dependency}' first.${RC}"
+      echo_error "'${dependency}' is not installed on your system or is not present in PATH."
+      echo_error "'$(basename $0)' requires '${dependency}' to run."
       exit 1
     fi
   done
